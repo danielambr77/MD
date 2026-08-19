@@ -1,0 +1,18 @@
+{
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "files.exclude": {
+        ".github": true,
+        "**/*.o": true,
+        "**/*.d": true,
+        "**/*.exe": true,
+        "**/*.dll": true,
+        "**/*.jar": true,
+        "**/*.bin": true,
+        "**/*.out": true,
+        "**/cmd_": true,
+        "**/out.lst": true,
+    },
+    "custom-makefile": "C:\\SGDK\\makefile.gen",
+    "GDK": "C:\\SGDK",
+    "gens.path": "C:\\Fusion\\fusion.exe",
+}
