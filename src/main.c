@@ -4,6 +4,10 @@
 #include "res_gfx.h"
 #include "res_snd.h"
 
+#define PLAYER_IDLE 0
+#define PLAYER_WALK 1
+#define PLAYER_RUN 2
+
 
 static Sprite *player;
 
@@ -13,6 +17,8 @@ static s16 playerY = 96;
 
 // velocidade do jogador
 s16 velocidade = 1;
+
+u16 playerState = PLAYER_IDLE;
 
 // velocidade de animação do sprite do jogador
 u16 velocidadeAnimacao = 3;
@@ -68,6 +74,15 @@ int main(bool hardReset)
     {
         // Lê o controle 1
         u16 button = JOY_readJoypad(JOY_1);
+
+        // Velocidade de movimento do personagem
+        playerState = PLAYER_IDLE;
+        velocidade = 2;
+
+        if(button & BUTTON_A){
+            playerState = PLAYER_RUN;
+            velocidade = 4; 
+        }
 
         // Indica se o personagem está se movimentando
         bool moving = FALSE;
@@ -128,6 +143,15 @@ int main(bool hardReset)
             moving = TRUE;
         }
 
+        if(moving){
+            if (button & BUTTON_A){
+                playerState = PLAYER_RUN;
+            }else{
+                playerState = PLAYER_WALK;
+            }
+        }else{
+            playerState = PLAYER_IDLE;
+        }
 
         // ==========================================
         // LIMITES DA TELA
@@ -161,40 +185,51 @@ int main(bool hardReset)
         // ANIMAÇÃO
         // ==========================================
 
-        if (moving)
-        {
-            /*
-             * O donut possui 8 frames:
-             *
-             * 0 = parado
-             * 1
-             * 2
-             * 3
-             * 4
-             * 5
-             * 6
-             * 7
-             *
-             * Enquanto estiver andando,
-             * alternamos entre os frames 1-7.
-             */
+        switch (playerState){
 
-            u16 frame = 1 + ((vtimer >> velocidadeAnimacao) % 7);
+            // ==========================================
+            // PARADO
+            // ==========================================
+            case PLAYER_IDLE:
 
-            SPR_setFrame(
-                player,
-                frame
-            );
+                SPR_setFrame(
+                    player,
+                    0
+                );
+
+            break;
+
+            // ==========================================
+            // ANDANDO
+            // ==========================================
+
+            case PLAYER_WALK:{
+                u16 frame = 1 + ((vtimer >> 3) % 7);
+
+                SPR_setFrame(
+                    player,
+                    frame
+                );
+
+            break;
+            }
+
+
+            // ==========================================
+            // CORRENDO
+            // ==========================================
+
+            case PLAYER_RUN: {
+                u16 frame = 1 + ((vtimer >> 2) % 7);
+
+                SPR_setFrame(
+                    player,
+                    frame
+                );
+
+            break;
+            }
         }
-        else
-        {
-            // Parado = frame 0
-            SPR_setFrame(
-                player,
-                0
-            );
-        }
-
 
         // ==========================================
         // ATUALIZA O SISTEMA DE SPRITES
