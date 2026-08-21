@@ -15,9 +15,19 @@ static Sprite *player;
 static s16 playerX = 144;
 static s16 playerY = 96;
 
-// velocidade do jogador
-s16 velocidade = 1;
+// velocidade de movimento do jogador
+s16 velocidade = 2;
 
+// Contador usado para aceleração
+u16 contadorVelocidade = 0;
+
+// velocidade máxima andando
+s16 velocidadeNormal = 2;
+
+// velocidade máxima correndo
+s16 velocidadeCorrendo = 4;
+
+// estado da animação do sprite do jogador
 u16 playerState = PLAYER_IDLE;
 
 // velocidade de animação do sprite do jogador
@@ -77,11 +87,29 @@ int main(bool hardReset)
 
         // Velocidade de movimento do personagem
         playerState = PLAYER_IDLE;
-        velocidade = 2;
 
-        if(button & BUTTON_A){
+        if (button & BUTTON_A){
             playerState = PLAYER_RUN;
-            velocidade = 4; 
+
+            contadorVelocidade++;
+
+            if (contadorVelocidade >= 10){
+                contadorVelocidade = 0;
+
+                if (velocidade < 4){
+                    velocidade++;
+                }
+            }
+        }else{
+            contadorVelocidade++;
+
+            if (contadorVelocidade >= 10){
+                contadorVelocidade = 0;
+
+                if (velocidade > 2){
+                    velocidade--;
+                }
+            }
         }
 
         // Indica se o personagem está se movimentando
@@ -220,7 +248,9 @@ int main(bool hardReset)
             // ==========================================
 
             case PLAYER_RUN: {
-                u16 frame = 1 + ((vtimer >> 2) % 7);
+                // % 8 - Sprite 256 x 64
+                // 0 parado, 1-7 caminhando, 8-15 correndo.
+                u16 frame = 1 + ((vtimer >> 2) % 8); 
 
                 SPR_setFrame(
                     player,
